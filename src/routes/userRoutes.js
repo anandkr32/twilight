@@ -1,11 +1,15 @@
 const express = require('express');
 const User = require('../models/user');
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
 
 // Create a new user
 router.post('/users', async (req, res) => {
   try {
-    const user = new User(req.body);
+    const user = new User({
+      ...req.body,
+      userId: uuidv4()
+    });
     await user.save();
     const { password, ...userWithoutPassword } = user.toObject();
     res.status(201).send(userWithoutPassword);

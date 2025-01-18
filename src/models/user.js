@@ -17,40 +17,33 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   designation: {
     type: String,
-    required: true
   },
   dob: {
     type: Date,
-    required: true
   },
   address: {
     type: String,
-    required: true
   },
   skills: {
     type: [String],
-    required: true
   },
   joiningDate: {
     type: Date,
-    required: true
   },
   accessLevel: {
     type: String,
     enum: ['admin', 'manage', 'employee'],
-    required: true
   },
   superiorId: {
     type: String,
-    required: true
   },
   subordinateIds: {
     type: [String],
-    required: true
   },
   password: {
     type: String,
