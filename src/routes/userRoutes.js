@@ -2,9 +2,10 @@ const express = require('express');
 const User = require('../models/user');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Create a new user
-router.post('/users', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const user = new User({
       ...req.body,
@@ -19,7 +20,7 @@ router.post('/users', async (req, res) => {
 });
 
 // Read all users
-router.get('/users', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const users = await User.find().select('-password');
     res.status(200).send(users);
@@ -29,7 +30,7 @@ router.get('/users', async (req, res) => {
 });
 
 // Read a user by ID
-router.get('/users/:id', async (req, res) => {
+router.get('/:id', authMiddleware,  async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
@@ -42,7 +43,7 @@ router.get('/users/:id', async (req, res) => {
 });
 
 // Update a user by ID
-router.patch('/users/:id', async (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
     if (!user) {
@@ -55,7 +56,7 @@ router.patch('/users/:id', async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete('/users/:id', async (req, res) => {
+router.delete('/:id',authMiddleware,  async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id).select('-password');
     if (!user) {

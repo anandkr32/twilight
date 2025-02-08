@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   userId: {
@@ -16,7 +17,8 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    unique: true
+    unique: true,
+    sparse: true // Ensures uniqueness for non-null values
   },
   designation: {
     type: String,
@@ -48,6 +50,10 @@ const userSchema = new mongoose.Schema({
     required: true
   }
 });
+
+userSchema.methods.validatePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 

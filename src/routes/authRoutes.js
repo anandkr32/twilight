@@ -1,6 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+require('dotenv').config();
+const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -15,12 +18,13 @@ router.post('/signup', async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
-        user = new User({ email, password: hashedPassword });
+        const userId = uuidv4();
+        user = new User({ userId, email, password: hashedPassword });
         await user.save();
 
         res.json({ msg: "User registered successfully" });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ msg: "Server error" });
     }
 });
@@ -33,39 +37,33 @@ router.post('/login', async (req, res) => {
         let user = await User.findOne({ email });
         if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+        const isPasswordValid = await user.validatePassword(password);
+        if (!isPasswordValid) {
+            return res.status(401).send('Invalid email or password');
+        }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
 
-        res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+        res.cookie('token', token, { httpOnly: true });
+
+        const { password: userPassword, ...userWithoutPassword } = user.toObject();
+        res.json({ token, user: userWithoutPassword });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ msg: "Server error" });
     }
 });
 
 // Protected Route (Example)
-router.get('/profile', verifyToken, async (req, res) => {
+router.get('/profile', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-password");
+        const user = await User.findById(req.user.userId).select("-password");
         res.json(user);
     } catch (err) {
         res.status(500).json({ msg: "Server error" });
     }
 });
-
-// Middleware to Verify JWT Token
-function verifyToken(req, res, next) {
-    const token = req.header("x-auth-token");
-    if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(400).json({ msg: "Invalid token" });
-    }
-}
 
 module.exports = router;
