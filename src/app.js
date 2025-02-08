@@ -7,10 +7,17 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
+
+// CORS configuration
+const corsOptions = {
+  origin: ['http://localhost:5000', 'https://instaems-188b5.web.app'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(cookieParser());
-const PORT = process.env.PORT || 3000;
 
 // MongoDB connection
 const mongoURI = 'mongodb+srv://instae93:ZPJ3lKdrS6hk80yA@instaems.r0jnl.mongodb.net/';
