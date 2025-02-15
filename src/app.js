@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5000', 'https://instaems-188b5.web.app'],
+  origin: ['http://localhost:3001', 'https://instaems-188b5.web.app', 'http://localhost:3000'],
   credentials: true
 };
 

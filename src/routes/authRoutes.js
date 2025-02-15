@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
             expiresIn: '1h',
         });
 
-        res.cookie('token', token, { httpOnly: true });
+        res.cookie('token', token, { httpOnly: true, sameSite: 'None', secure: true });
 
         const { password: userPassword, ...userWithoutPassword } = user.toObject();
         res.json({ token, user: userWithoutPassword });
