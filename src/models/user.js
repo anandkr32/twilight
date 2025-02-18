@@ -53,12 +53,8 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    minLength: 6,
-  },
-},
-{timestamps:true}
-);
+  }
+});
 
 userSchema.methods.validatePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
