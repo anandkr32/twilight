@@ -15,7 +15,7 @@ router.post('/signup', async (req, res) => {
 
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ msg: "User already exists" });
-
+ 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const userId = uuidv4();
@@ -56,14 +56,14 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Protected Route (Example)
-router.get('/profile', authMiddleware, async (req, res) => {
+//Logout API
+router.post("/logout", async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select("-password");
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ msg: "Server error" });
+      res.cookie("token", null, { expires: new Date(Date.now()) });
+      res.status(200).json({msg:"Logout Succesfully"});
+    } catch (error) {
+      res.status(500).json({msg:"Something went wrong while logout"});
     }
-});
+  });
 
 module.exports = router;
