@@ -80,7 +80,7 @@ router.patch("/users/:id", async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete("/users/:id", async (req, res) => {
+router.delete("/deleteUser/:id", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id).select(
       "-password"
@@ -88,7 +88,8 @@ router.delete("/users/:id", async (req, res) => {
     if (!user) {
       return res.status(404).send();
     }
-    res.status(200).send(user);
+    const updatedUsers = await User.find().select("-password");
+    res.status(200).send(updatedUsers);
   } catch (error) {
     res.status(500).send(error);
   }
