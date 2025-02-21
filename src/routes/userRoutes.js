@@ -82,7 +82,7 @@ router.patch("/users/:userId", async (req, res) => {
 // Delete a user by ID
 router.delete("/deleteUser/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id).select(
+    const user = await User.findByIdAndDelete(req.params.userId).select(
       "-password"
     );
     if (!user) {
