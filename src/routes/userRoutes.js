@@ -86,7 +86,7 @@ router.delete("/deleteUser/:id", async (req, res) => {
     const user = await User.findByIdAndDelete(id).select("-password");
 
     if (!user) {
-      return res.status(404).send ({ msg: "User not found" });
+      return res.status(404).json ({ msg: "User not found" });
     }
 
     const updatedUsers = await User.find().select("-password");
