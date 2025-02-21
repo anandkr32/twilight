@@ -80,13 +80,13 @@ router.patch("/users/:userId", async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete("/deleteUser/:id", async (req, res) => {
+router.delete("/deleteUser/:userId", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.userId).select(
       "-password"
     );
     if (!user) {
-      return res.status(404).json("user not present");
+      return res.status(404).json({msg:"user not present"});
     }
     const updatedUsers = await User.find().select("-password");
     res.status(200).send(updatedUsers);
