@@ -86,12 +86,12 @@ router.delete("/deleteUser/:id", async (req, res) => {
     const user = await User.findByIdAndDelete(id).select("-password");
 
     if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+      return res.status(404).send ({ msg: "User not found" });
     }
 
     const updatedUsers = await User.find().select("-password");
 
-    res.status(200).json({ success: true, updatedUsers });
+    res.status(200).send(updatedUsers);
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ msg: "Internal Server Error", error: error.message });
