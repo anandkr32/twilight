@@ -80,19 +80,24 @@ router.patch("/users/:userId", async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete("/deleteUser/:userId", async (req, res) => {
+router.delete("/deleteUser/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const user = await User.findByIdAndDelete(req.params.userId).select(
-      "-password"
-    );
+    const user = await User.findByIdAndDelete(id).select("-password");
+
     if (!user) {
-      return res.status(404).json({msg:"user not present"});
+      return res.status(404).json({ msg: "User not found" });
     }
+
     const updatedUsers = await User.find().select("-password");
-    res.status(200).send(updatedUsers);
+
+    res.status(200).json({ success: true, updatedUsers });
   } catch (error) {
-    res.status(500).send(error);
+    console.error("Error deleting user:", error);
+    res.status(500).json({ msg: "Internal Server Error", error: error.message });
   }
 });
+
+
 
 module.exports = router;
