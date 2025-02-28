@@ -3,15 +3,15 @@ const User = require("../models/user");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
-// const validateSignupData = require("../utils/validation")
+const {validateSignupData,  validateEditUserData } = require("../utils/validation"); // Fixed import
 
 // Read all users/employee
 router.get("/getAllUsers", async (req, res) => {
   try {
     const users = await User.find().select("-password");
-    res.status(200).send(users);
+    res.status(200).json(users);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
 // Create a new user/employee
@@ -40,64 +40,66 @@ router.post("/createUser", async (req, res) => {
       address,
       joiningDate,
     });
+
     await user.save();
-    // const { password, ...userWithoutPassword } = user.toObject();
-    res.status(201).send(user);
+    res.status(201).json(user);
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).json({ message: "Bad Request", error: error.message });
   }
 });
 
-
-
 // Read a user by ID
-router.get("/users/:id", async (req, res) => {
+router.get("/editUser/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
-      return res.status(404).send();
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).send(user);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
 
-// Update a user by ID
-router.patch("/users/:userId", async (req, res) => {
+// 🔥 FIXED: Update a user by ID
+router.patch("/updateUser/:userId", async (req, res) => {
   try {
+    if (!validateEditUserData(req)) {
+      return res.status(400).json({ success: false, message: "Edit not allowed" });
+    }
+
     const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true,
       runValidators: true,
     }).select("-password");
+
     if (!user) {
-      return res.status(404).send();
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-    res.status(200).send(user);
+
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    res.status(400).send(error);
+    console.error("Error updating user:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
   }
 });
 
 // Delete a user by ID
 router.delete("/deleteUser/:id", async (req, res) => {
-  const { id } = req.params;
   try {
-    const user = await User.findByIdAndDelete(id).select("-password");
+    const user = await User.findByIdAndDelete(req.params.id).select("-password");
 
     if (!user) {
-      return res.status(404).json ({ msg: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     const updatedUsers = await User.find().select("-password");
 
-    res.status(200).send(updatedUsers);
+    res.status(200).json(updatedUsers);
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ msg: "Internal Server Error", error: error.message });
+    res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
   }
 });
-
-
 
 module.exports = router;
