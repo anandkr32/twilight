@@ -64,9 +64,9 @@ router.get("/editUser/:id", async (req, res) => {
 // 🔥 FIXED: Update a user by ID
 router.patch("/updateUser/:userId", async (req, res) => {
   try {
-    if (!validateEditUserData(req)) {
-      return res.status(400).json({ success: false, message: "Edit not allowed" });
-    }
+    // if (!validateEditUserData(req)) {
+    //   return res.status(400).json({ success: false, message: "Edit not allowed" });
+    // }
 
     const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true,
