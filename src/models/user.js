@@ -53,7 +53,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-  }
+  },
+  firstLogin: { 
+    type: Boolean, 
+    default: false },
 
 }, { timestamps: true });
 

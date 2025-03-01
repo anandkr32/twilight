@@ -18,7 +18,7 @@ router.post("/signup", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const userId = uuidv4();
-    user = new User({ userId, name, email, password: hashedPassword });
+    user = new User({ userId, name, email, password: hashedPassword, firstLogin: true });
     await user.save();
 
     res.json({ msg: "User registered successfully" });
@@ -50,8 +50,10 @@ router.post("/login", async (req, res) => {
       sameSite: "None",
       secure: true,
     });
-
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
+    if (user.firstLogin) {
+      return res.json({ firstLogin: true, token, user: userWithoutPassword });
+    } 
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
     console.error(err);

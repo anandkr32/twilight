@@ -49,7 +49,7 @@ router.post("/createUser", async (req, res) => {
 });
 
 // Read a user by ID
-router.get("/editUser/:id", async (req, res) => {
+router.get("/users/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
@@ -67,7 +67,7 @@ router.patch("/updateUser/:userId", async (req, res) => {
     // if (!validateEditUserData(req)) {
     //   return res.status(400).json({ success: false, message: "Edit not allowed" });
     // }
-
+    req.body.firstLogin = false;
     const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
       new: true,
       runValidators: true,
