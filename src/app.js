@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const salaryRoutes = require('./routes/salaryRoutes');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -32,6 +33,7 @@ app.use(express.json());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/salary", salaryRoutes);
 
 // Sample route
 app.get('/', (req, res) => {
