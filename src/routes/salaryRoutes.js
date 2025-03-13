@@ -4,15 +4,51 @@ const calculateSalary = require("../utils/salaryCalculator");
 const express = require("express");
 const router = express.Router();
 
+//GET Api to get the Salry Account Details
+router.get("/getSalaryAccount", async(req, res)=>{
+  try{
+    const salary = await Salary.find({})
+    res.status(200).json(salary)
+
+  }catch(err){
+    res.status(400).json({error:err.message})
+  }
+})
+
+//GET Api for salary details using employee id
+router.get("/getSalaryAccount/:employeeId", async (req, res) => {
+  try {
+    const { employeeId } = req.params; // Get employeeId from URL params
+
+    const salary = await Salary.findOne({ employeeId })
+
+    if (!salary) {
+      return res.status(404).json({ success: false, message: "Salary account not found" });
+    }
+
+    res.status(200).json({ success: true, salary });
+
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Post API for generating Account Details
 router.post("/createAccountDetails", async (req, res) => {
   try {
-    const {employeeId, ifscCode, accountNumber, panNumber, uanNumber } = req.body;
+    const {employeeId, ifscCode, bankName, accountNumber, panNumber, uanNumber,pfNumberOfEmployee, pfNumberOfEmployer } = req.body;
     const user = await User.findById(employeeId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-    const accountDetails = new Salary({employeeId, ifscCode, accountNumber, panNumber, uanNumber }); // Fixed `ifscCode` to `ifsc`
+    const existingSalary = await Salary.findOne({employeeId});
+    //Existing Details Validation
+    if(existingSalary){
+      return res.status(400).json({err:"salary details already added"})
+    }
+
+    const accountDetails = new Salary({employeeId, employeeName: user.name, ifscCode, bankName, accountNumber, panNumber, uanNumber, pfNumberOfEmployee, pfNumberOfEmployer }); // Fixed `ifscCode` to `ifsc`
+    
     await accountDetails.save();
     res.status(200).json({ accountDetails });
   } catch (err) {
@@ -20,45 +56,116 @@ router.post("/createAccountDetails", async (req, res) => {
   }
 });
 
-// Generate Salary Logic (Uncommented)
-const generateSalary = async (req, res) => {
+//PATCH Api to create salary details
+router.patch("/updateSalaryDetails", async (req, res) => {
   try {
-    const { userId, basic, hra, specialAllowance, professionalTax, incomeTax } = req.body;
-
-    // Check if the user exists
-    const employee = await User.findById(userId);
-    if (!employee) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    // Calculate salary
-    const { totalEarnings, totalDeductions, netSalary } = calculateSalary(
-      basic,
-      hra,
-      specialAllowance,
-      professionalTax,
-      incomeTax
-    );
-
-    // Save salary to database
-    const salary = new Salary({
-      employeeId: userId,
+    const {
+      employeeId,
       basic,
       hra,
       specialAllowance,
       professionalTax,
       incomeTax,
-      totalEarnings,
-      totalDeductions,
-      netSalary,
+      deductions,
+      pfEmployer,
+      pfEmployee,
+      ctc
+    } = req.body;
+
+    // Find the existing salary record
+    const salaryRecord = await Salary.findOne({ employeeId });
+
+    if (!salaryRecord) {
+      return res.status(404).json({ success: false, message: "Salary account not found for this employee" });
+    }
+
+    // Calculate Gross & Net Salary
+    const grossSalary = basic + hra + specialAllowance;
+    const totalDeductions = pfEmployee + professionalTax + incomeTax + deductions;
+    const netSalary = grossSalary - totalDeductions;
+
+    // Update salaryStructure within the record
+    salaryRecord.salaryStructure = {
+      basic,
+      hra,
+      specialAllowance,
+      professionalTax,
+      incomeTax,
+      deductions,
+      pfEmployee,
+      pfEmployer     
+    };
+
+    // Update calculated fields
+   
+    salaryRecord.ctc = ctc;
+    salaryRecord.totalEarnings = grossSalary;
+    salaryRecord.totalDeductions = totalDeductions;
+    salaryRecord.netSalary = netSalary;
+
+    await salaryRecord.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Salary details updated successfully",
+      updatedRecord: salaryRecord
     });
 
-    await salary.save();
-    res.status(201).json({ success: true, message: "Salary generated successfully", salary });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
-};
+});
+
+//Get Api for pacakge of an employee
+router.get("/packageDetails/:employeeId", async(req, res)=>{
+  try{
+    const employeeId = req.params
+
+  }catch(err){
+    res.status(404).json({error:err.message})
+  }
+})
+
+
+// Generate Salary Logic (Uncommented)
+// const generateSalary = async (req, res) => {
+//   try {
+//     const { userId, basic, hra, specialAllowance, professionalTax, incomeTax } = req.body;
+
+//     // Check if the user exists
+//     const employee = await User.findById(userId);
+//     if (!employee) {
+//       return res.status(404).json({ success: false, message: "User not found" });
+//     }
+
+//     // Calculate salary
+//     const { totalEarnings, totalDeductions, netSalary } = calculateSalary(
+//       basic,
+//       hra,
+//       specialAllowance,
+//       professionalTax,
+//       incomeTax
+//     );
+
+//     // Save salary to database
+//     const salary = new Salary({
+//       employeeId: userId,
+//       basic,
+//       hra,
+//       specialAllowance,
+//       professionalTax,
+//       incomeTax,
+//       totalEarnings,
+//       totalDeductions,
+//       netSalary,
+//     });
+
+//     await salary.save();
+//     res.status(201).json({ success: true, message: "Salary generated successfully", salary });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
 module.exports = router;  // ✅ Correct export
 

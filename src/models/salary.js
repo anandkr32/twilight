@@ -5,7 +5,12 @@ const salarySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-  }, 
+  },
+  employeeName: { type: String },
+  bankName: {
+    type: String,
+    required: true,
+  },
   accountNumber: {
     type: String,
     required: true,
@@ -22,6 +27,15 @@ const salarySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  pfNumberOfEmployee: {
+    type: "String",
+    requred: true,
+  },
+  pfNumberOfEmployer: {
+    type: String,
+    required: true,
+  },
+
   salaryStructure: {
     basic: {
       type: Number,
@@ -47,19 +61,32 @@ const salarySchema = new mongoose.Schema({
       type: Number,
       default: 0,
     },
+    pfEmployee: {
+      default: 0,
+      type: Number,
+    },
+    pfEmployer: {
+      default: 0,
+      type: Number,
+    },
   },
   totalEarnings: {
     type: Number,
+    default: 0,
     // required: true,
   },
   totalDeductions: {
     type: Number,
+    default: 0,
     // required: true,
   },
   netSalary: {
     type: Number,
+    default: 0,
     // required: true,
   },
+ 
+
   createdAt: {
     type: Date,
     default: Date.now,
