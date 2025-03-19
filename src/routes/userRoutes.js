@@ -14,6 +14,7 @@ router.get("/getAllUsers", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
+
 // Create a new user/employee
 router.post("/createUser", async (req, res) => {
   try {
@@ -92,9 +93,7 @@ router.delete("/deleteUser/:id", async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-
     const updatedUsers = await User.find().select("-password");
-
     res.status(200).json(updatedUsers);
   } catch (error) {
     console.error("Error deleting user:", error);

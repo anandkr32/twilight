@@ -116,56 +116,39 @@ router.patch("/updateSalaryDetails", async (req, res) => {
   }
 });
 
-//Get Api for pacakge of an employee
-router.get("/packageDetails/:employeeId", async(req, res)=>{
-  try{
-    const employeeId = req.params
+//PATCH Api to update Account details
+router.patch("/updateAccountDetails", async (req, res) => {
+  try {
+    const { employeeId, ...updateData } = req.body;
 
-  }catch(err){
-    res.status(404).json({error:err.message})
+    // Check if user exists
+    const user = await User.findById(employeeId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Update salary details
+    const salary = await Salary.findOneAndUpdate(
+      { employeeId }, 
+      { $set: updateData }, 
+      { new: true, runValidators: true }
+    );
+
+    if (!salary) {
+      return res.status(404).json({ success: false, message: "Salary details not found" });
+    }
+
+    res.status(200).json({ success: true, salary });
+
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
-})
+});
 
 
-// Generate Salary Logic (Uncommented)
-// const generateSalary = async (req, res) => {
-//   try {
-//     const { userId, basic, hra, specialAllowance, professionalTax, incomeTax } = req.body;
 
-//     // Check if the user exists
-//     const employee = await User.findById(userId);
-//     if (!employee) {
-//       return res.status(404).json({ success: false, message: "User not found" });
-//     }
 
-//     // Calculate salary
-//     const { totalEarnings, totalDeductions, netSalary } = calculateSalary(
-//       basic,
-//       hra,
-//       specialAllowance,
-//       professionalTax,
-//       incomeTax
-//     );
 
-//     // Save salary to database
-//     const salary = new Salary({
-//       employeeId: userId,
-//       basic,
-//       hra,
-//       specialAllowance,
-//       professionalTax,
-//       incomeTax,
-//       totalEarnings,
-//       totalDeductions,
-//       netSalary,
-//     });
-
-//     await salary.save();
-//     res.status(201).json({ success: true, message: "Salary generated successfully", salary });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
 
 module.exports = router;  // ✅ Correct export
 

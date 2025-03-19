@@ -39,11 +39,14 @@ const salarySchema = new mongoose.Schema({
   salaryStructure: {
     basic: {
       type: Number,
-      // required: true,
+      default:0,
+      required: true,
+     
     },
     hra: {
       type: Number,
       default: 0,
+      required: true,
     },
     specialAllowance: {
       type: Number,
@@ -52,6 +55,7 @@ const salarySchema = new mongoose.Schema({
     professionalTax: {
       type: Number,
       default: 0,
+      required: true,
     },
     incomeTax: {
       type: Number,
