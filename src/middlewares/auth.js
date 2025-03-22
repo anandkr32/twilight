@@ -7,7 +7,7 @@ const userAuth = async (req, res, next) => {
     console.log(JWT_SECRET_KEY);
   
     //read the token from req cookies
-    const { token } = req.cookies;
+    const  token  = req.cookies.authToken;
     if (!token) {
       throw new Error("token not found user");
     }
