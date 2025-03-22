@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true // Ensures uniqueness for non-null values
   },
+  gender:{
+    type: String,
+    
+  },
   designation: {
     type: String,
   },

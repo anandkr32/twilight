@@ -1,8 +1,11 @@
 const JWT = require("jsonwebtoken");
 const User = require("../models/user");
+require("dotenv").config();
 const userAuth = async (req, res, next) => {
   try {
     const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+    console.log(JWT_SECRET_KEY);
+  
     //read the token from req cookies
     const { token } = req.cookies;
     if (!token) {
@@ -10,9 +13,10 @@ const userAuth = async (req, res, next) => {
     }
     //validate token
     const decodedObj = JWT.verify(token, JWT_SECRET_KEY);
-    const { _id } = decodedObj;
+    console.log(decodedObj);
+    const { userId } = decodedObj;
 
-    const user = await User.findById(_id);
+    const user = await User.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -23,4 +27,4 @@ const userAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { userAuth };
+module.exports = userAuth ;

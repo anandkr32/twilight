@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-const authMiddleware = require("../middleware/authMiddleware");
 const User = require("../models/user");
 
 const router = express.Router();
@@ -41,7 +40,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).send("Invalid email or password");
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
