@@ -6,7 +6,7 @@ const express = require("express");
 const router = express.Router();
 
 //GET Api to get the Salry Account Details
-router.get("/getSalaryAccount", userAuth, async(req, res)=>{
+router.get("/getSalaryAccount",  async(req, res)=>{
   try{
     const salary = await Salary.find({})
     res.status(200).json(salary)
