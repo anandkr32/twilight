@@ -7,7 +7,7 @@ const userAuth = require("../middlewares/auth");
 const {validateSignupData,  validateEditUserData } = require("../utils/validation"); // Fixed import
 
 // Read all users/employee
-router.get("/getAllUsers", userAuth, async (req, res) => {
+router.get("/getAllUsers",  async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.status(200).json(users);
@@ -17,7 +17,7 @@ router.get("/getAllUsers", userAuth, async (req, res) => {
 });
 
 // Create a new user/employee
-router.post("/createUser", userAuth, async (req, res) => {
+router.post("/createUser",  async (req, res) => {
   try {
     // validateSignupData(req);
     const {
@@ -51,7 +51,7 @@ router.post("/createUser", userAuth, async (req, res) => {
 });
 
 // Read a user by ID
-router.get("/users/:id", userAuth, async (req, res) => {
+router.get("/users/:id",  async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
@@ -64,7 +64,7 @@ router.get("/users/:id", userAuth, async (req, res) => {
 });
 
 // 🔥 FIXED: Update a user by ID
-router.patch("/updateUser/:userId", userAuth, async (req, res) => {
+router.patch("/updateUser/:userId",  async (req, res) => {
   try {
     // if (!validateEditUserData(req)) {
     //   return res.status(400).json({ success: false, message: "Edit not allowed" });
@@ -87,7 +87,7 @@ router.patch("/updateUser/:userId", userAuth, async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete("/deleteUser/:id", userAuth, async (req, res) => {
+router.delete("/deleteUser/:id",  async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id).select("-password");
 

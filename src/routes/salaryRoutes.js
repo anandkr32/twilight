@@ -17,7 +17,7 @@ router.get("/getSalaryAccount", userAuth, async(req, res)=>{
 })
 
 //GET Api for salary details using employee id
-router.get("/getSalaryAccount/:employeeId", userAuth,  async (req, res) => {
+router.get("/getSalaryAccount/:employeeId",   async (req, res) => {
   try {
     const { employeeId } = req.params; // Get employeeId from URL params
 
@@ -35,7 +35,7 @@ router.get("/getSalaryAccount/:employeeId", userAuth,  async (req, res) => {
 });
 
 // Post API for generating Account Details
-router.post("/createAccountDetails", userAuth, async (req, res) => {
+router.post("/createAccountDetails",  async (req, res) => {
   try {
     const {employeeId, ifscCode, bankName, accountNumber, panNumber, uanNumber,pfNumberOfEmployee, pfNumberOfEmployer } = req.body;
     const user = await User.findById(employeeId);
@@ -58,7 +58,7 @@ router.post("/createAccountDetails", userAuth, async (req, res) => {
 });
 
 //PATCH Api to create salary details
-router.patch("/updateSalaryDetails", userAuth,  async (req, res) => {
+router.patch("/updateSalaryDetails",   async (req, res) => {
   try {
     const {
       employeeId,
@@ -118,7 +118,7 @@ router.patch("/updateSalaryDetails", userAuth,  async (req, res) => {
 });
 
 //PATCH Api to update Account details
-router.patch("/updateAccountDetails", userAuth, async (req, res) => {
+router.patch("/updateAccountDetails",  async (req, res) => {
   try {
     const { employeeId, ...updateData } = req.body;
 
