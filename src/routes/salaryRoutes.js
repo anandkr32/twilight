@@ -4,13 +4,13 @@ const User = require("../models/user"); // Import User model
 const calculateSalary = require("../utils/salaryCalculator");
 const express = require("express");
 const router = express.Router();
+const calculateSalaryFromCTC = require("../utils/salaryCalculator");
 
 //GET Api to get the Salry Account Details
 router.get("/getSalaryAccount",  async(req, res)=>{
   try{
     const salary = await Salary.find({})
     res.status(200).json(salary)
-
   }catch(err){
     res.status(400).json({error:err.message})
   }
@@ -20,15 +20,11 @@ router.get("/getSalaryAccount",  async(req, res)=>{
 router.get("/getSalaryAccount/:employeeId",   async (req, res) => {
   try {
     const { employeeId } = req.params; // Get employeeId from URL params
-
     const salary = await Salary.findOne({ employeeId })
-
     if (!salary) {
       return res.status(404).json({ success: false, message: "Salary account not found" });
     }
-
     res.status(200).json({ success: true, salary });
-
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -72,14 +68,11 @@ router.patch("/updateSalaryDetails",   async (req, res) => {
       pfEmployee,
       ctc
     } = req.body;
-
     // Find the existing salary record
     const salaryRecord = await Salary.findOne({ employeeId });
-
     if (!salaryRecord) {
       return res.status(404).json({ success: false, message: "Salary account not found for this employee" });
     }
-
     // Calculate Gross & Net Salary
     const grossSalary = basic + hra + specialAllowance;
     const totalDeductions = pfEmployee + professionalTax + incomeTax + deductions;
@@ -116,6 +109,47 @@ router.patch("/updateSalaryDetails",   async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 });
+
+//PATCH Api to create salary details from CTC
+router.patch("/updateSalaryDetailsFromCTC", async (req, res) => {
+  try {
+    const {
+      employeeId,
+      includeGratuity,
+      ctc,
+    } = req.body;
+
+    const employee = await User.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    const existing = await Salary.findOne({ employeeId });
+    if (!existing) {
+      return res.status(400).json({ success: false, message: "Salary account must be created first" });
+    }
+
+    const breakdown = calculateSalaryFromCTC(ctc, includeGratuity);
+
+    existing.salaryStructure = breakdown.salaryStructure;
+    existing.totalEarnings = breakdown.totalEarnings;
+    existing.totalDeductions = breakdown.totalDeductions;
+    existing.netSalary = breakdown.netSalary;
+    existing.ctc = breakdown.ctc;
+    existing.gratuity = breakdown.gratuity; // add this to schema if not present
+
+    await existing.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Salary updated from CTC",
+      updatedRecord: existing,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 
 //PATCH Api to update Account details
 router.patch("/updateAccountDetails",  async (req, res) => {

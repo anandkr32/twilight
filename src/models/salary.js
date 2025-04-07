@@ -73,6 +73,10 @@ const salarySchema = new mongoose.Schema({
       default: 0,
       type: Number,
     },
+    gratuity: {
+      default: 0,
+      type: Number,
+    }
   },
   totalEarnings: {
     type: Number,
