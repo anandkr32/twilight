@@ -19,6 +19,7 @@ function calculateSalaryFromCTC(ctc, includeGratuity = false) {
 
   return {
     salaryStructure: {
+      ctc: Math.round(ctc),
       basic: Math.round(basic),
       hra: Math.round(hra),
       specialAllowance: Math.round(specialAllowance),

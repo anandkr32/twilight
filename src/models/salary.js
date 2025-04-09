@@ -37,10 +37,10 @@ const salarySchema = new mongoose.Schema({
   },
 
   salaryStructure: {
-    ctcAmount:{
+    ctc:{
       default: 0,
-      type: Number,   
-      required: true,
+      type: Number,
+      required: true,  
     },
     basic: {
       type: Number,

@@ -135,7 +135,7 @@ router.patch("/updateSalaryDetailsFromCTC", async (req, res) => {
     existing.totalEarnings = breakdown.totalEarnings;
     existing.totalDeductions = breakdown.totalDeductions;
     existing.netSalary = breakdown.netSalary;
-    existing.ctc = breakdown.ctc;
+  
     existing.gratuity = breakdown.gratuity; // add this to schema if not present
 
     await existing.save();
