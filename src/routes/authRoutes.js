@@ -46,8 +46,10 @@ router.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "None",
-      secure: true,
+      sameSite: "Lax",
+      secure:  false, //process.env.NODE_ENV === "production" ? true : false,
+      domain: "localhost",
+      path: "/" // Ensure the cookie is available for all routes
     });
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
     if (user.firstLogin) {
