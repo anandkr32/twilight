@@ -7,7 +7,7 @@ const router = express.Router();
 const calculateSalaryFromCTC = require("../utils/salaryCalculator");
 
 //GET Api to get the Salry Account Details
-router.get("/getSalaryAccount",  async(req, res)=>{
+router.get("/getSalaryAccount", userAuth, async(req, res)=>{
   try{
     const salary = await Salary.find({})
     res.status(200).json(salary)
@@ -17,7 +17,7 @@ router.get("/getSalaryAccount",  async(req, res)=>{
 })
 
 //GET Api for salary details using employee id
-router.get("/getSalaryAccount/:employeeId",   async (req, res) => {
+router.get("/getSalaryAccount/:employeeId", userAuth,  async (req, res) => {
   try {
     const { employeeId } = req.params; // Get employeeId from URL params
     const salary = await Salary.findOne({ employeeId })
@@ -31,7 +31,7 @@ router.get("/getSalaryAccount/:employeeId",   async (req, res) => {
 });
 
 // Post API for generating Account Details
-router.post("/createAccountDetails",  async (req, res) => {
+router.post("/createAccountDetails", userAuth, async (req, res) => {
   try {
     const {employeeId, ifscCode, bankName, accountNumber, panNumber, uanNumber,pfNumberOfEmployee, pfNumberOfEmployer } = req.body;
     const user = await User.findById(employeeId);
@@ -54,7 +54,7 @@ router.post("/createAccountDetails",  async (req, res) => {
 });
 
 //PATCH Api to create salary details
-router.patch("/updateSalaryDetails",   async (req, res) => {
+router.patch("/updateSalaryDetails", userAuth,  async (req, res) => {
   try {
     const {
       employeeId,
@@ -111,7 +111,7 @@ router.patch("/updateSalaryDetails",   async (req, res) => {
 });
 
 //PATCH Api to create salary details from CTC
-router.patch("/updateSalaryDetailsFromCTC", async (req, res) => {
+router.patch("/updateSalaryDetailsFromCTC", userAuth, async (req, res) => {
   try {
     const {
       employeeId,
@@ -152,7 +152,7 @@ router.patch("/updateSalaryDetailsFromCTC", async (req, res) => {
 
 
 //PATCH Api to update Account details
-router.patch("/updateAccountDetails",  async (req, res) => {
+router.patch("/updateAccountDetails", userAuth, async (req, res) => {
   try {
     const { employeeId, ...updateData } = req.body;
 

@@ -61,16 +61,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
 //Logout API
 router.post("/logout", async (req, res) => {
   try {
-    res.cookie("token", "", {
-      expires: new Date(0),
+    res.clearCookie("token", { 
       httpOnly: true,
       secure: true,
       sameSite: "None",
     });
-
     res.status(200).json({ msg: "Logout Successfully" });
   } catch (error) {
     res.status(500).json({ msg: "Something went wrong while logging out" });
