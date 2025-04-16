@@ -7,7 +7,7 @@ const userAuth = require("../middlewares/auth");
 const {validateSignupData,  validateEditUserData } = require("../utils/validation"); // Fixed import
 
 // Read all users/employee
-router.get("/getAllUsers",  async (req, res) => {
+router.get("/getAllUsers", userAuth , async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.status(200).json(users);
