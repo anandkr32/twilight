@@ -48,7 +48,6 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure:  false, //process.env.NODE_ENV === "production" ? true : false,
-      domain: "localhost",
       path: "/" // Ensure the cookie is available for all routes
     });
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
