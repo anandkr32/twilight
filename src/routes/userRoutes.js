@@ -17,14 +17,30 @@ router.get("/getLoggedInUser", userAuth, async (req, res) => {
 });
 
 // Read all users/employee
-router.get("/getAllUsers", userAuth , async (req, res) => {
+router.get("/getAllUsers", userAuth, async (req, res) => {
   try {
-    const users = await User.find().select("-password");
-    res.status(200).json(users);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find()
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments();
+
+    res.status(200).json({
+      users,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      currentPage: page,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
+
 
 // Create a new user/employee
 router.post("/createUser", userAuth,  async (req, res) => {

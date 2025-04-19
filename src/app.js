@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const salaryRoutes = require('./routes/salaryRoutes');
+const leaveRoutes = require('./routes/leaveRoutes');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -44,7 +45,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/salary", salaryRoutes);
-
+app.use('/api/leave', leaveRoutes)
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello, World!');
