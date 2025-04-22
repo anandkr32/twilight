@@ -4,6 +4,8 @@ const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const userAuth = require("../middlewares/auth");
+
+const upload = require("../middlewares/multer");
 const {validateSignupData,  validateEditUserData } = require("../utils/validation"); // Fixed import
 
 //api to get loggedin user
@@ -127,5 +129,59 @@ router.delete("/deleteUser/:id",  userAuth, async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
   }
 });
+
+//uplaod profile picture
+
+
+// Example route
+router.post("/upload-profile", userAuth,  upload.single("profilePicture"), async (req, res) => {
+  try {
+    const imageUrl = req.file.path;
+    const userId = req.user._id; // Comes from token
+    console.log("Uploaded file info:", req.file);
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profilePicture: imageUrl },
+      { new: true }
+    ).select("-password");
+    console.log("user with profile picture", user)
+
+    res.json({ success: true, imageUrl, user });
+  } catch (error) {
+    console.error("Upload failed:", error);
+    res.status(500).json({ success: false, message: "Image upload failed" });
+  }
+});
+
+//Patch APi to change profile picture
+router.patch("/upload-profile/:userId", userAuth, upload.single("profilePicture"), async (req, res) => {
+  if (req.user._id.toString() !== req.params.userId) {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
+
+  try {
+    const imageUrl = req.file.path;
+    const user = await User.findByIdAndUpdate(
+      req.params.userId,
+      { profilePicture: imageUrl },
+      { new: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, message: "Profile picture uploaded", user });
+  } catch (error) {
+    console.error("Upload failed:", error);
+    res.status(500).json({ success: false, message: "Image upload failed", error: error.message });
+  }
+});
+
+
+
+
+
+
 
 module.exports = router;

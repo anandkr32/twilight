@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  profilePicture: {
+    type: String,
+    default: '', // or provide a default avatar URL
+  },
   email: { 
     type: String,
     required: true,
