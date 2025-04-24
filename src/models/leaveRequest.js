@@ -6,11 +6,11 @@ const leaveRequestSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
-  toEmployeeId: {
+  toEmployeeIds: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", // Assuming this is the approver/manager
     required: true
-  },
+  }],
   leaveType: {
     type: String,
     enum: ["casual", "sick", "earned", "maternity", "paternity", "unpaid","outdoor","work from home"],
@@ -24,6 +24,11 @@ const leaveRequestSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  numberOfDays:{
+    type:Number,
+    
+  },
+
   reason: {
     type: String,
     trim: true
