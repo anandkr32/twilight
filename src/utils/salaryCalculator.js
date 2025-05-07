@@ -1,4 +1,6 @@
-const calculateIncomeTax_2025_26 = require('./incomeTax/calculateIncomeTax_2025_26');
+const {
+  calculateIncomeTax_2025_26,
+} = require('./incomeTax/taxUtils');
 
 function calculateSalaryFromCTC(ctc, includeGratuity = false) {
   const gratuity = includeGratuity ? ctc * 0.0481 : 0;

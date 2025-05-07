@@ -57,7 +57,7 @@ router.post("/createAccountDetails", userAuth, async (req, res) => {
 router.patch("/updateSalaryDetails", userAuth,  async (req, res) => {
   try {
     const {
-      employeeId,
+      employeeId, 
       basic,
       hra,
       specialAllowance,
