@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const LeaveRequest = require("../models/leaveRequest");
-
 // API to Get All Leave Requests
 router.get("/getAllLeaveRequests", async (req, res) => {
   try {
@@ -14,7 +13,6 @@ router.get("/getAllLeaveRequests", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
 // POST API to send leave request to the manager
 router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
   try {
@@ -26,7 +24,9 @@ router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
     const to = new Date(toDate);
 
     if (from > to) {
-      return res.status(400).json({ message: "From date cannot be after To date" });
+      return res
+        .status(400)
+        .json({ message: "From date cannot be after To date" });
     }
 
     const numberOfDays = Math.floor((to - from) / (1000 * 60 * 60 * 24)) + 1;
@@ -45,11 +45,15 @@ router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
     if (existingRequest) {
       return res
         .status(400)
-        .json({ message: "Leave request already applied for the selected dates" });
+        .json({
+          message: "Leave request already applied for the selected dates",
+        });
     }
 
     if (toEmployeeIds.includes(fromEmployeeId)) {
-      return res.status(400).json({ message: "Cannot send leave request to yourself" });
+      return res
+        .status(400)
+        .json({ message: "Cannot send leave request to yourself" });
     }
 
     const leaveRequest = new LeaveRequest({
@@ -69,13 +73,13 @@ router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
-
 // PATCH API to approve a leave request
 router.patch("/approveLeaveRequest/:status/:requestId", async (req, res) => {
   try {
     const { requestId } = req.params;
+    console.log(requestId);
     const status = req.params.status;
+    console.log("Status", status);
     const updatedLeaveRequest = await LeaveRequest.findByIdAndUpdate(
       requestId,
       { status: status },
@@ -87,7 +91,6 @@ router.patch("/approveLeaveRequest/:status/:requestId", async (req, res) => {
     if (!updatedLeaveRequest) {
       return res.status(404).json({ message: "Leave request not found" });
     }
-
     res
       .status(200)
       .json({ message: "Leave request approved", updatedLeaveRequest });
@@ -95,5 +98,4 @@ router.patch("/approveLeaveRequest/:status/:requestId", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
 module.exports = router;

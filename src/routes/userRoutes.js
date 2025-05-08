@@ -51,6 +51,7 @@ router.post("/createUser", userAuth,  async (req, res) => {
     const {
       name,
       email,
+      gender,
       password,
       phoneNumber,
       designation,
@@ -62,6 +63,7 @@ router.post("/createUser", userAuth,  async (req, res) => {
     const user = new User({
       name,
       email,
+      gender,
       phoneNumber,
       // password: passworHash,
       userId: uuidv4(),
