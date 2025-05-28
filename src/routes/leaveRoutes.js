@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const LeaveRequest = require("../models/leaveRequest");
+const LeaveBalance = require('../models/leaveBalanceSchema')
+const userAuth = require("../middlewares/auth")
 // API to Get All Leave Requests
-router.get("/getAllLeaveRequests", async (req, res) => {
+router.get("/getAllLeaveRequests", userAuth, async (req, res) => {
   try {
     const leaveRequests = await LeaveRequest.find({})
       .populate("fromEmployeeId", "name")
@@ -14,7 +16,7 @@ router.get("/getAllLeaveRequests", async (req, res) => {
   }
 });
 // POST API to send leave request to the manager
-router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
+router.post("/sendLeaveRequest/:status/:toEmployeeIds", userAuth, async (req, res) => {
   try {
     const { fromEmployeeId, leaveType, fromDate, toDate, reason } = req.body;
     const toEmployeeIds = req.params.toEmployeeIds.split(",");
@@ -74,7 +76,7 @@ router.post("/sendLeaveRequest/:status/:toEmployeeIds", async (req, res) => {
   }
 });
 // PATCH API to approve a leave request
-router.patch("/approveLeaveRequest/:status/:requestId", async (req, res) => {
+router.patch("/approveLeaveRequest/:status/:requestId", userAuth, async (req, res) => {
   try {
     const { requestId } = req.params;
     console.log(requestId);

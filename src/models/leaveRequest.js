@@ -28,7 +28,6 @@ const leaveRequestSchema = new mongoose.Schema({
     type:Number,
     
   },
-
   reason: {
     type: String,
     trim: true
@@ -41,7 +40,8 @@ const leaveRequestSchema = new mongoose.Schema({
   comment: {
     type: String, // Manager's comment
     trim: true
-  }
+  },
+
 }, {
   timestamps: true
 });

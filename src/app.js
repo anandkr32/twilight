@@ -5,6 +5,7 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const salaryRoutes = require('./routes/salaryRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
+const leaveBalanceRoute = require('./routes/leaveBalanceRoutes')
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -46,6 +47,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use('/api/leave', leaveRoutes)
+app.use('/api/leaveBalance', leaveBalanceRoute )
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello, World!');
