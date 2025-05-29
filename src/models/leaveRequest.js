@@ -11,6 +11,11 @@ const leaveRequestSchema = new mongoose.Schema({
     ref: "User", // Assuming this is the approver/manager
     required: true
   }],
+  tenantId: {
+    type: String,
+    required: true,
+    ref: 'Tenant',
+  },
   leaveType: {
     type: String,
     enum: ["casual", "sick", "earned", "maternity", "paternity", "unpaid","outdoor","work from home"],
