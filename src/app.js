@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const onboardingRoutes = require('./routes/onboardingRoutes');
 const salaryRoutes = require('./routes/salaryRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
 const leaveBalanceRoute = require('./routes/leaveBalanceRoutes')
@@ -45,6 +46,7 @@ app.use(express.json());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use('/api/leave', leaveRoutes)
 app.use('/api/leaveBalance', leaveBalanceRoute )

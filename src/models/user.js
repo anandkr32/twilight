@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '', // or provide a default avatar URL
   },
+  maritalStatus: {
+    type: String,
+    enum: ['single', 'married', 'divorced', 'widowed'],
+    default: 'single',
+  },
   email: { 
     type: String,
     required: true,
