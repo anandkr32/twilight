@@ -5,19 +5,19 @@ const router = express.Router();
 const userAuth = require("../middlewares/auth");
 const User = require("../models/user");
 const Salary = require("../models/salary");
-const LeaveBalance = require("../models/leaveBalance");
-const calculateSalaryFromCTC = require("../utils/calculateSalaryFromCTC"); // 👈 your salary calculator
+const LeaveBalance = require("../models/leaveBalanceSchema");
+const calculateSalaryFromCTC = require("../utils/salaryCalculator"); // 👈 your salary calculator
 
 router.post("/onboard", userAuth, async (req, res) => {
   try {
     const {
       // User fields
       name,
-      email,
-      maritalStatus,
+      email,      
       gender,
       phoneNumber,
       dob,
+      maritalStatus,
       address,
       designation,
       joiningDate,
@@ -55,12 +55,12 @@ router.post("/onboard", userAuth, async (req, res) => {
     // Step 1: Save user
     const user = new User({
       userId,
-      name,
-      maritalStatus,
+      name,      
       email,
       gender,
       phoneNumber,
       dob,
+      maritalStatus,
       address,
       designation,
       joiningDate,
