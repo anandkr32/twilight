@@ -6,6 +6,11 @@ const salarySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  tenantId: {
+    type: String,
+    required: true,
+    ref: 'Tenant',
+  },
   employeeName: { type: String },
   bankName: {
     type: String,

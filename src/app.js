@@ -7,10 +7,10 @@ const onboardingRoutes = require('./routes/onboardingRoutes');
 const salaryRoutes = require('./routes/salaryRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
 const leaveBalanceRoute = require('./routes/leaveBalanceRoutes')
+const tenantRoutes = require('./routes/tenantRoutes');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -50,6 +50,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use("/api/salary", salaryRoutes);
 app.use('/api/leave', leaveRoutes)
 app.use('/api/leaveBalance', leaveBalanceRoute )
+app.use('/api/tenants', tenantRoutes)
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello, World!');
