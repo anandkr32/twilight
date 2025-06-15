@@ -6,17 +6,6 @@ const userAuth = async (req, res, next) => {
   try {
     const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
     console.log("JWT Secret:", JWT_SECRET_KEY);
-
-    // Read token from Authorization header
-    // const authHeader = req.headers.authorization;
-    // if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    //   throw new Error("Token not found in Authorization header");
-    // }
-
-    // const token = authHeader.split(" ")[1]; // Extract the token after "Bearer"
-    // console.log("Extracted Token:", token);
-
-    // Read token from cookies
     const token = req.cookies.token;
 
     // Validate token

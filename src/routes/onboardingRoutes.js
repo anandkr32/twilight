@@ -69,6 +69,7 @@ router.post("/onboard", userAuth, async (req, res) => {
       superiorId,
       subordinateIds,
       password: passwordHash,
+      tenantId: tenantId
     });
 
     const savedUser = await user.save();
@@ -85,6 +86,7 @@ router.post("/onboard", userAuth, async (req, res) => {
     // Step 3: Save salary
     const salary = new Salary({
       employeeId: savedUser._id,
+      tenantId: tenantId,
       employeeName: name,
       bankName,
       accountNumber,

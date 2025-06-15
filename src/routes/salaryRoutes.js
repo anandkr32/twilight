@@ -8,8 +8,12 @@ const calculateSalaryFromCTC = require("../utils/salaryCalculator");
 
 //GET Api to get the Salry Account Details
 router.get("/getSalaryAccount", userAuth, async(req, res)=>{
+   const tenantId = req.user.tenantId;
+    if (!tenantId) {
+      return res.status(403).json({ message: "Tenant ID is missing in authenticated user" });
+    }
   try{
-    const salary = await Salary.find({})
+    const salary = await Salary.find({tenantId})
     res.status(200).json(salary)
   }catch(err){
     res.status(400).json({error:err.message})

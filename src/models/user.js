@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
   },
   accessLevel: {
     type: String,
-    enum: ["admin", "manage", "employee"],
+    enum: ["admin", "manager", "employee"],
   },
   superiorId: {
     type: String,
