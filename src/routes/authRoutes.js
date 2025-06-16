@@ -4,11 +4,10 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 const User = require("../models/user");
-
+const Tenant = require("../models/tenant");
 const router = express.Router();
 
 // Signup Route
-
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password,  } = req.body;
@@ -61,7 +60,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 //Logout API
 router.post("/logout", async (req, res) => {
   try {
@@ -75,5 +73,31 @@ router.post("/logout", async (req, res) => {
     res.status(500).json({ msg: "Something went wrong while logging out" });
   }
 });
+
+// Find User by Email or Phone
+router.post("/findUserByEmailOrPhone", async (req, res)=>{
+  try{
+    const {input}= req.body;
+    console.log("Input received:", input);
+    if(!input) return res.status(400).json({ msg: "Input is required" });
+    const user = await User.findOne({
+      $or: [
+        { emailId: new RegExp(`^${input}$`, "i")},
+        { phoneNumber: input }
+      ]
+    });
+    if(!user) return res.status(404).json({ msg: "User not found" });
+    const {tenantId} = user.toObject();
+    if(!tenantId) return res.status(404).json({ msg: "Tenant ID not found for this user" });
+    const tenant = await Tenant.findOne({ tenantId });
+    const {companyName} = tenant.toObject();
+    console.log("Tenant found:", tenant);
+    res.json({ tenantId, companyName  });
+
+  }catch(err){
+    console.error("Error in findUserByEmailOrPhone:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+})
 
 module.exports = router;
