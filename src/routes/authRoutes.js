@@ -21,7 +21,6 @@ router.post("/signup", async (req, res) => {
 
     res.json({ msg: "User registered successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -55,7 +54,6 @@ router.post("/login", async (req, res) => {
     } 
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -78,24 +76,21 @@ router.post("/logout", async (req, res) => {
 router.post("/findUserByEmailOrPhone", async (req, res)=>{
   try{
     const {input}= req.body;
-    console.log("Input received:", input);
     if(!input) return res.status(400).json({ msg: "Input is required" });
     const user = await User.findOne({
       $or: [
-        { emailId: new RegExp(`^${input}$`, "i")},
+        { email: new RegExp(`^${input}$`, "i")},
         { phoneNumber: input }
       ]
     });
     if(!user) return res.status(404).json({ msg: "User not found" });
-    const {tenantId} = user.toObject();
+    const {tenantId, email, name} = user.toObject();
     if(!tenantId) return res.status(404).json({ msg: "Tenant ID not found for this user" });
     const tenant = await Tenant.findOne({ tenantId });
     const {companyName} = tenant.toObject();
-    console.log("Tenant found:", tenant);
-    res.json({ tenantId, companyName  });
+    res.json({ tenantId, companyName, email, name });
 
   }catch(err){
-    console.error("Error in findUserByEmailOrPhone:", err);
     res.status(500).json({ msg: "Server error" });
   }
 })

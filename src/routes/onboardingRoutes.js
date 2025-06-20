@@ -129,7 +129,6 @@ router.post("/onboard", userAuth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Onboarding Error:", error);
     res.status(500).json({
       message: "Something went wrong",
       error: error.message,

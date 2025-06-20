@@ -142,7 +142,6 @@ router.patch("/updateUser/:userId", userAuth, async (req, res) => {
 
     res.status(200).json({ success: true, user });
   } catch (error) {
-    console.error("Error updating user:", error);
     res
       .status(500)
       .json({
@@ -168,7 +167,6 @@ router.delete("/deleteUser/:id", userAuth, async (req, res) => {
     const updatedUsers = await User.find().select("-password");
     res.status(200).json(updatedUsers);
   } catch (error) {
-    console.error("Error deleting user:", error);
     res
       .status(500)
       .json({
@@ -190,17 +188,13 @@ router.post(
     try {
       const imageUrl = req.file.path;
       const userId = req.user._id; // Comes from token
-      console.log("Uploaded file info:", req.file);
       const user = await User.findByIdAndUpdate(
         userId,
         { profilePicture: imageUrl },
         { new: true }
       ).select("-password");
-      console.log("user with profile picture", user);
-
       res.json({ success: true, imageUrl, user });
     } catch (error) {
-      console.error("Upload failed:", error);
       res.status(500).json({ success: false, message: "Image upload failed" });
     }
   }
@@ -232,7 +226,6 @@ router.patch(
 
       res.json({ success: true, message: "Profile picture uploaded", user });
     } catch (error) {
-      console.error("Upload failed:", error);
       res
         .status(500)
         .json({

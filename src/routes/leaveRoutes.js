@@ -79,9 +79,7 @@ router.post("/sendLeaveRequest/:status/:toEmployeeIds", userAuth, async (req, re
 router.patch("/approveLeaveRequest/:status/:requestId", userAuth, async (req, res) => {
   try {
     const { requestId } = req.params;
-    console.log(requestId);
     const status = req.params.status;
-    console.log("Status", status);
     const updatedLeaveRequest = await LeaveRequest.findByIdAndUpdate(
       requestId,
       { status: status },
