@@ -6,17 +6,24 @@ require("dotenv").config();
 const User = require("../models/user");
 const Tenant = require("../models/tenant");
 const router = express.Router();
+const verifyCaptcha = require("../utils/verifyCaptcha"); // Assuming you have a utility to verify captcha
 
 // Signup Route
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password,  } = req.body;
+    const { name, email, password } = req.body;
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: "User already exists" });
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const userId = uuidv4();
-    user = new User({ userId, name, email, password: hashedPassword, firstLogin: true });
+    user = new User({
+      userId,
+      name,
+      email,
+      password: hashedPassword,
+      firstLogin: true,
+    });
     await user.save();
 
     res.json({ msg: "User registered successfully" });
@@ -45,13 +52,13 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "None",
-      secure:  true, //process.env.NODE_ENV === "production" ? true : false,
-      path: "/" // Ensure the cookie is available for all routes
+      secure: true, //process.env.NODE_ENV === "production" ? true : false,
+      path: "/", // Ensure the cookie is available for all routes
     });
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
     if (user.firstLogin) {
       return res.json({ firstLogin: true, token, user: userWithoutPassword });
-    } 
+    }
     res.json({ token, user: userWithoutPassword });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
@@ -61,7 +68,7 @@ router.post("/login", async (req, res) => {
 //Logout API
 router.post("/logout", async (req, res) => {
   try {
-    res.clearCookie("token", { 
+    res.clearCookie("token", {
       httpOnly: true,
       secure: true,
       sameSite: "None",
@@ -73,26 +80,27 @@ router.post("/logout", async (req, res) => {
 });
 
 // Find User by Email or Phone
-router.post("/findUserByEmailOrPhone", async (req, res)=>{
-  try{
-    const {input}= req.body;
-    if(!input) return res.status(400).json({ msg: "Input is required" });
+router.post("/findUserByEmailOrPhone", async (req, res) => {
+  try {
+    const { input, captchaToken } = req.body;
+    const captchaVerified = await verifyCaptcha(captchaToken);
+    if (!captchaVerified) {
+      return res.status(400).json({ error: "Captcha verification failed" });
+    }
+    if (!input) return res.status(400).json({ msg: "Input is required" });
     const user = await User.findOne({
-      $or: [
-        { email: new RegExp(`^${input}$`, "i")},
-        { phoneNumber: input }
-      ]
+      $or: [{ email: new RegExp(`^${input}$`, "i") }, { phoneNumber: input }],
     });
-    if(!user) return res.status(404).json({ msg: "User not found" });
-    const {tenantId, email, name} = user.toObject();
-    if(!tenantId) return res.status(404).json({ msg: "Tenant ID not found for this user" });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    const { tenantId, email, name } = user.toObject();
+    if (!tenantId)
+      return res.status(404).json({ msg: "Tenant ID not found for this user" });
     const tenant = await Tenant.findOne({ tenantId });
-    const {companyName} = tenant.toObject();
+    const { companyName } = tenant.toObject();
     res.json({ tenantId, companyName, email, name });
-
-  }catch(err){
+  } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }
-})
+});
 
 module.exports = router;
