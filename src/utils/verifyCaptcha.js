@@ -1,7 +1,8 @@
-const fetch = require('node-fetch');
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY;
 
 const verifyCaptcha = async (token) => {
+  const fetch = (await import('node-fetch')).default;
+
   const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
     method: 'POST',
     headers: {
@@ -13,3 +14,5 @@ const verifyCaptcha = async (token) => {
   const data = await response.json();
   return data.success;
 };
+
+module.exports = verifyCaptcha;
