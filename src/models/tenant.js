@@ -11,8 +11,9 @@ const tenantSchema = new mongoose.Schema({
     required: true,
   },
   address: String,
-  contactEmail: String,
+  contactEmail: {type:String, required: true, unique: true},
   contactPhone: String,
+  gstn: String, // Goods and Services Tax Number
   // Add more fields as needed
 }, { timestamps: true });
 
