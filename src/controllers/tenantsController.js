@@ -1,10 +1,24 @@
-const Tenant = require("../models/tenant");
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
+// controllers/tenantController.js
+const mongoose  = require("mongoose");
+const bcrypt    = require("bcryptjs");
 const { v4: uuidv4 } = require("uuid");
 
+const Tenant = require("../models/tenant");
+const User   = require("../models/user");
+const Role   = require("../models/role");
+
+const seedRolesForTenant = require("../utils/seedRolesForTenant"); // idempotent seeder
+
+/**
+ * POST /api/tenants
+ * Body: { companyName, address, contactEmail, contactPhone, adminName, gstn }
+ */
 exports.createTenant = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    /* 1 ── Extract payload */
     const {
       companyName,
       address,
@@ -14,55 +28,85 @@ exports.createTenant = async (req, res) => {
       gstn,
     } = req.body;
 
-    // Step 1: Check if tenant already exists
-    const alreadyExists = await Tenant.findOne({ contactEmail }); // <-- missing await in your version
-    if (alreadyExists) {
+    /* 2 ── Prevent duplicate tenant by contactEmail */
+    const exists = await Tenant.findOne({ contactEmail }).session(session);
+    if (exists) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ error: "Tenant with this email already exists" });
     }
 
+    /* 3 ── Create tenant (UUID tenantId) */
     const tenantId = uuidv4();
-    const defaultPassword = "Welcome@2025";
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-    // Step 2: Create Tenant
-    const tenant = new Tenant({
+    const tenant = await Tenant.create(
+      [
+        {
+          tenantId,
+          companyName,
+          address,
+          contactEmail,
+          contactPhone,
+          gstn,
+        },
+      ],
+      { session }
+    ).then((docs) => docs[0]); // create() + session returns an array
+
+    /* 4 ── Seed default roles INSIDE this transaction */
+    await seedRolesForTenant(tenantId, session);      // <- single call, passes session
+
+    /* 5 ── Get the freshly-seeded Admin role */
+    const adminRole = await Role.findOne({
       tenantId,
-      companyName,
-      address,
-      contactEmail,
-      contactPhone,
-      gstn,
-    });
+      slug: "admin",
+    }).session(session);
 
-    await tenant.save();
+    if (!adminRole) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(500).json({ error: "Admin role not found after seeding" });
+    }
 
-    // Step 3: Create Admin User
-    const adminUser = new User({
-      userId: uuidv4(),
-      name: adminName,
-      email: contactEmail,
-      password: hashedPassword,
-      accessLevel: "admin",
-      tenantId: tenantId,
-      firstLogin: true,
-      phoneNumber: contactPhone, // spelling corrected
-    });
+    /* 6 ── Create first admin user linked to Admin role */
+    const defaultPassword = "Welcome@2025";
+    const hashedPassword  = await bcrypt.hash(defaultPassword, 10);
 
-    await adminUser.save();
+    await User.create(
+      [
+        {
+          userId: uuidv4(),
+          name: adminName,
+          email: contactEmail,
+          password: hashedPassword,
+          role: adminRole._id,   // ObjectId reference
+          tenantId,              // UUID
+          phoneNumber: contactPhone,
+          firstLogin: true,
+        },
+      ],
+      { session }
+    );
 
-    // Step 4: Respond
-    res.status(201).json({
+    /* 7 ── Commit transaction */
+    await session.commitTransaction();
+    session.endSession();
+
+    /* 8 ── Respond */
+    return res.status(201).json({
       message: "Tenant and admin user created successfully",
       tenant,
       adminCredentials: {
-        email: contactEmail,
-        password: defaultPassword, // return plaintext here only once
+        email:    contactEmail,
+        password: defaultPassword, // show only once
       },
     });
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     console.error("Error creating tenant:", err);
-    res.status(500).json({ error: "Something went wrong" });
+    return res.status(500).json({ error: "Something went wrong" });
   }
 };
