@@ -12,9 +12,16 @@ const {
 } = require("../utils/validation"); // Fixed import
 
 //api to get loggedin user
+
 router.get("/getLoggedInUser", userAuth, async (req, res) => {
   try {
-    const user = req.user; // already added by userAuth middleware
+    // repopulate the full user with role populated
+    const user = await User.findById(req.user._id).populate("role");
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     res.status(200).json({ user });
   } catch (error) {
     res
@@ -22,6 +29,7 @@ router.get("/getLoggedInUser", userAuth, async (req, res) => {
       .json({ message: "Something went wrong", error: error.message });
   }
 });
+
 
 
 // Read all users/employees belonging to the same tenant
