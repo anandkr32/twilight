@@ -73,6 +73,11 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    emergencyContact: {
+    name:     { type: String, trim: true },
+    relation: { type: String, trim: true },
+    phone:    { type: String, trim: true },
+    },
     firstLogin: {
       type: Boolean,
       default: false,

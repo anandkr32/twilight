@@ -3,10 +3,8 @@ const express  = require("express");
 const bcrypt   = require("bcryptjs");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
-
 const router = express.Router();
-
-const auth            = require("../middlewares/auth");            // JWT auth
+const userAuth        = require("../middlewares/auth");            // JWT auth
 const checkPermission = require("../middlewares/checkPermission"); // RBAC
 const User            = require("../models/user");
 const Role            = require("../models/role");
@@ -17,7 +15,7 @@ const calcSalary      = require("../utils/salaryCalculator");
 // POST /api/employees/onboard
 router.post(
   "/onboard",
-  auth,
+  userAuth,
   checkPermission("create_employee"),      // 👈 only HR / Admin etc. can hit this
   async (req, res) => {
     const session = await mongoose.startSession();
@@ -36,6 +34,8 @@ router.post(
         address,
         designation,
         joiningDate,
+        //emergency contact
+        emergencyContact,
 
         // Optional
         skills,
@@ -119,6 +119,7 @@ router.post(
             address,
             designation,
             joiningDate,
+            emergencyContact,
             skills,
             role: role._id,              // 🎯 reference to Role
             superiorId,

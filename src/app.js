@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 // CORS configuration
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = ['http://localhost:3001', 'https://instaems-d750f.web.app', 'http://localhost:3000'];
+    const allowedOrigins = ['http://localhost:3001', "https://instaems-frontend.onrender.com",'https://instaems-d750f.web.app', 'http://localhost:3000'];
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {

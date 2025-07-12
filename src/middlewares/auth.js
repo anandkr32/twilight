@@ -6,10 +6,8 @@ const userAuth = async (req, res, next) => {
   try {
     const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
     const token = req.cookies.token;
-
     // Validate token
     const decodedObj = JWT.verify(token, JWT_SECRET_KEY);
-
     const { userId } = decodedObj;
 
     // Find user in database
@@ -19,9 +17,10 @@ const userAuth = async (req, res, next) => {
     }
 
     req.user = user; // Attach user to request
+    console.log("logged in user",user)
     next();
   } catch (err) {
-    res.status(401).json({ error: "Unauthorized: " + err.message });
+    res.status(401).json({ error: "Unauthorized Access: " + err.message });
   }
 };
 
