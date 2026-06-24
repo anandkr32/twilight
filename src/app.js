@@ -8,12 +8,13 @@ const salaryRoutes = require('./routes/salaryRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
 const leaveBalanceRoute = require('./routes/leaveBalanceRoutes')
 const tenantRoutes = require('./routes/tenantRoutes');
+const attendanceRoute = require('./routes/attendanceRoutes')
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+const MONGO_URL= process.env.MONGO_URI
 // CORS configuration
 const corsOptions = {
   origin: (origin, callback) => {
@@ -35,7 +36,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // MongoDB connection
-const mongoURI = 'mongodb+srv://instae93:ZPJ3lKdrS6hk80yA@instaems.r0jnl.mongodb.net/';
+const mongoURI = MONGO_URL;
 mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
@@ -48,9 +49,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use("/api/salary", salaryRoutes);
+app.use("/api/attendance", attendanceRoute)
 app.use('/api/leave', leaveRoutes)
 app.use('/api/leaveBalance', leaveBalanceRoute )
 app.use('/api/tenants', tenantRoutes)
+
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello, World!');
